@@ -1,6 +1,5 @@
 from app.models.task import Task
 
-
 def test_get_tasks_no_saved_tasks(client):
     # Act
     response = client.get("/tasks")
@@ -123,7 +122,6 @@ def test_update_task_not_found(client):
 
 
 def test_delete_task(client, one_task):
-    # Act
     response = client.delete("/tasks/1")
     response_body = response.get_json()
 
