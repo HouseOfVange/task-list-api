@@ -14,9 +14,8 @@ class Task(db.Model):
             "id": self.id,
             "title" : self.title,
             "description" : self.description,
-            "is_complete" : False if self.completed_at == None else self.completed_at
+            "is_complete" : False if self.completed_at == None else True
         }
-
     
     @classmethod
     def from_dict(cls, values):
