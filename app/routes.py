@@ -3,15 +3,25 @@ from flask import Blueprint, jsonify, request
 from app.models.task import Task
 from app.models.goal import Goal
 from app import db
+from sqlalchemy import desc
 
 tasks_bp = Blueprint("tasks", __name__, url_prefix="/tasks")
 
 @tasks_bp.route("", methods = ["GET", "POST"])
 def get_tasks():
     if request.method == "GET":
-        tasks = Task.query.all()
+        sort_query = request.args.get("sort")
+        if sort_query == "asc":
+            tasks = Task.query.order_by(Task.title)
+        elif sort_query == "desc":
+            tasks = Task.query.order_by(desc(Task.title))
+            # tasks = tasks.reverse()
+        else:
+            tasks = Task.query.all()
+        
         if tasks == None:
             return [], 200
+
         tasks_response = [task.to_dict() for task in tasks]
         return jsonify(tasks_response), 200
 
@@ -46,7 +56,8 @@ def handle_task(task_id):
         task.description = form_data["description"]
         db.session.commit()
 
-        return jsonify(task.to_dict()), 200
+        response_body = {"task":task.to_dict()}
+        return jsonify(response_body), 200
 
         # request_body = request.get_json()
         # task.replace_with_dict(request_body)
