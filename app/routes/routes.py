@@ -2,7 +2,9 @@ from flask import Blueprint, jsonify, request
 from app.models.task import Task
 from app.models.goal import Goal
 from app import db
-from datetime import datetime
+from datetime import datetime 
+import requests
+from app.routes.slack_bot_routes import slack_message
 
 tasks_bp = Blueprint("tasks", __name__, url_prefix="/tasks")
 
@@ -90,6 +92,9 @@ def patch_task_mark_complete(task_id):
     if task is None:
         return jsonify(None), 404
     else:
+        # send notification to task-notifications slack channel
+        slack_message(f"Someone just completed the task {task.title}")
+
         if task.completed_at == None:
             task.completed_at = datetime.utcnow()
 
