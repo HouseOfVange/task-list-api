@@ -83,20 +83,16 @@ def post_task_ids_list_to_goal(goal_id):
     for task_id in request_body["task_ids"]:
         task = Task.query.get(task_id)
         goal.tasks.append(task)
-        # remove link with.... 
+        # remove the link between a task and the goal with.... 
         # task.goal = None
 
-        # db.session.add(goal)
         db.session.commit()
-
-    t_ids_list = [t.task_id for t in goal.tasks]
 
     response_body = {
         "id": goal.goal_id,
-        "task_ids": t_ids_list
-        # "task_ids": request_body["task_ids"]
+        "task_ids": [t.task_id for t in goal.tasks]
     }
-    return jsonify(response_body), 201
+    return jsonify(response_body), 200
 
 @goals_bp.route("/<goal_id>/tasks", methods = ["GET"])
 def get_tasks_of_a_goal(goal_id):
