@@ -66,19 +66,13 @@ def put_task(task_id):
         response_body = {"task":task.to_dict()}
         return jsonify(response_body), 200
 
-        # request_body = request.get_json()
-        # task.replace_with_dict(request_body)
-        # db.session.commit()
-        # response_body = {"task" : task.to_dict()}
-        # return jsonify(response_body), 200
-
 @tasks_bp.route("/<task_id>", methods = ["DELETE"])
 def delete_task(task_id):
     task = Task.query.get(task_id)
     if task is None:
         return jsonify(None), 404
     else:
-        response_body = {"details": f"Task {task.id} \"{task.title}\" successfully deleted"}
+        response_body = {"details": f"Task {task.task_id} \"{task.title}\" successfully deleted"}
 
         db.session.delete(task)
         db.session.commit()

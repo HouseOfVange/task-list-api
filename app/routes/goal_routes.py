@@ -1,5 +1,7 @@
 from flask import Blueprint, jsonify, request
+from flask.globals import session
 from app.models.goal import Goal
+from app.models.task import Task
 from app import db
 
 goals_bp = Blueprint("goals", __name__, url_prefix="/goals")
@@ -71,3 +73,42 @@ def delete_goal(goal_id):
         db.session.commit()
 
         return jsonify(response_body), 200
+
+@goals_bp.route("/<goal_id>/tasks", methods = ["POST"])
+def post_task_ids_list_to_goal(goal_id):
+    goal = Goal.query.get(goal_id)
+
+    request_body = request.get_json()
+
+    for task_id in request_body["task_ids"]:
+        task = Task.query.get(task_id)
+        goal.tasks.append(task)
+        # remove link with.... 
+        # task.goal = None
+
+        # db.session.add(goal)
+        db.session.commit()
+
+    t_ids_list = [t.task_id for t in goal.tasks]
+
+    response_body = {
+        "id": goal.goal_id,
+        "task_ids": t_ids_list
+        # "task_ids": request_body["task_ids"]
+    }
+    return jsonify(response_body), 201
+
+@goals_bp.route("/<goal_id>/tasks", methods = ["GET"])
+def get_tasks_of_a_goal(goal_id):
+    goal = Goal.query.get(goal_id)
+    
+    if goal is None:
+        return jsonify(None), 404
+
+    response_body = {
+        "id": goal.goal_id,
+        "title": goal.title,
+        "tasks": [t.to_dict() for t in goal.tasks]
+        }
+
+    return jsonify(response_body), 200
